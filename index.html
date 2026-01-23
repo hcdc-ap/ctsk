@@ -1,837 +1,830 @@
 <!DOCTYPE html>
 <html lang="vi">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tra cứu Chương trình Sức khỏe - HCDC</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* --- 1. CẤU HÌNH MÀU SẮC TỪ LOGO HCDC --- */
-    :root {
-      /* Màu Teal chủ đạo từ vòng tròn trung tâm */
-      --hcdc-teal: #008b99;
-      /* Màu Teal đậm hơn cho các điểm nhấn tối */
-      --hcdc-teal-dark: #006a75;
-      /* Màu nền nhạt dựa trên tone Teal */
-      --hcdc-teal-light: #e0f2f1;
-      /* Màu Cam chủ đạo từ hình bàn tay */
-      --hcdc-orange: #f26522;
-      /* Màu trung tính */
-      --text-dark: #333333;
-      --text-light: #666666;
-      --bg-body: #f4f7f6;
-      --white: #ffffff;
-    }
-
-    /* --- 2. CSS CHUNG --- */
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: var(--bg-body);
-      color: var(--text-dark);
-      margin: 0;
-      padding-top: 140px;
-      /* Khoảng trống cho fixed header */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    /* --- 3. HEADER & THANH TÌM KIẾM CỐ ĐỊNH --- */
-    .fixed-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: var(--white);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      z-index: 100;
-      padding: 15px 20px;
-      text-align: center;
-      border-bottom: 3px solid var(--hcdc-teal);
-    }
-
-    .brand-title {
-      color: var(--hcdc-teal);
-      margin: 0 0 10px 0;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Giả lập icon logo nhỏ bên cạnh tiêu đề */
-    .brand-title::before {
-      content: '';
-      display: inline-block;
-      width: 30px;
-      height: 30px;
-      background: conic-gradient(var(--hcdc-teal) 0% 70%, var(--hcdc-orange) 70% 100%);
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .brand-subtitle {
-      margin: 0 0 15px 0;
-      color: var(--text-light);
-      font-size: 0.9rem;
-    }
-
-    .search-box-container {
-      max-width: 700px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    #searchInput {
-      width: 100%;
-      padding: 12px 20px;
-      padding-left: 45px;
-      /* Chỗ cho icon tìm kiếm */
-      border-radius: 25px;
-      border: 2px solid var(--hcdc-teal-light);
-      font-size: 1rem;
-      outline: none;
-      background-color: var(--bg-body);
-      transition: all 0.3s;
-    }
-
-    /* Icon kính lúp giả bằng CSS */
-    .search-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--hcdc-teal);
-      font-size: 1.2rem;
-    }
-
-    #searchInput:focus {
-      border-color: var(--hcdc-teal);
-      box-shadow: 0 0 0 3px rgba(0, 139, 153, 0.2);
-      background-color: var(--white);
-    }
-
-    /* --- 4. NỘI DUNG CHÍNH (GRID LAYOUT) --- */
-    .main-container {
-      width: 100%;
-      max-width: 1200px;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 25px;
-    }
-
-    .category-card {
-      background: var(--white);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      border-top: 4px solid var(--hcdc-teal);
-      height: fit-content;
-    }
-
-    .category-header {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--hcdc-teal-dark);
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--hcdc-teal-light);
-      display: flex;
-      align-items: center;
-    }
-
-    /* Thêm icon trước tên nhóm */
-    .category-header i {
-      margin-right: 10px;
-      color: var(--hcdc-orange);
-    }
-
-    .program-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .program-item {
-      background: var(--hcdc-teal-light);
-      color: var(--hcdc-teal-dark);
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      border-left: 3px solid transparent;
-      display: flex;
-      align-items: center;
-    }
-
-    /* Hiệu ứng khi di chuột vào chương trình */
-    .program-item:hover {
-      background: var(--hcdc-teal);
-      color: var(--white);
-      transform: translateX(5px);
-      border-left: 3px solid var(--hcdc-orange);
-      box-shadow: 2px 4px 8px rgba(0, 139, 153, 0.3);
-    }
-
-    /* Số thứ tự chương trình */
-    .prog-id {
-      font-weight: bold;
-      margin-right: 8px;
-      color: var(--hcdc-orange);
-    }
-
-    .program-item:hover .prog-id {
-      color: var(--white);
-    }
-
-    /* --- 5. MODAL (CỬA SỔ CHI TIẾT) --- */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(2px);
-      /* Làm mờ nền */
-    }
-
-    .modal-box {
-      background: var(--white);
-      width: 900px;
-      max-width: 95%;
-      border-radius: 15px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-      /* Hiệu ứng trượt lên */
-      animation: slideUp 0.4s ease-out;
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(50px);
-        opacity: 0;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tra cứu Chương trình Sức khỏe - HCDC</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* --- 1. CẤU HÌNH MÀU SẮC TỪ LOGO HCDC --- */
+      :root {
+        /* Màu Teal chủ đạo từ vòng tròn trung tâm */
+        --hcdc-teal: #008b99;
+        /* Màu Teal đậm hơn cho các điểm nhấn tối */
+        --hcdc-teal-dark: #006a75;
+        /* Màu nền nhạt dựa trên tone Teal */
+        --hcdc-teal-light: #e0f2f1;
+        /* Màu Cam chủ đạo từ hình bàn tay */
+        --hcdc-orange: #f26522;
+        /* Màu trung tính */
+        --text-dark: #333333;
+        --text-light: #666666;
+        --bg-body: #f4f7f6;
+        --white: #ffffff;
       }
 
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .modal-header {
-      background: var(--hcdc-teal);
-      color: var(--white);
-      padding: 15px 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title-text {
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.8rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .close-btn:hover {
-      color: var(--hcdc-orange);
-      transform: rotate(90deg);
-    }
-
-    .modal-tabs {
-      display: flex;
-      background: #f0f0f0;
-      border-bottom: 2px solid #e0e0e0;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 15px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--text-light);
-      background: transparent;
-      transition: all 0.3s;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    /* Tab đang được chọn */
-    .tab-btn.active {
-      background: var(--white);
-      color: var(--hcdc-teal-dark);
-      /* Dùng màu cam cho active tab để nổi bật */
-      border-bottom: 4px solid var(--hcdc-orange);
-    }
-
-    .modal-content-body {
-      padding: 25px;
-      overflow-y: auto;
-      line-height: 1.6;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .info-box {
-      background: var(--bg-body);
-      padding: 15px;
-      border-radius: 10px;
-      border-left: 4px solid var(--hcdc-teal);
-    }
-
-    .info-label {
-      font-weight: 700;
-      color: var(--hcdc-teal-dark);
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .task-list ul {
-      padding-left: 20px;
-      color: var(--text-dark);
-    }
-
-    .task-list li {
-      margin-bottom: 8px;
-    }
-
-    .unit-tag {
-      display: inline-block;
-      background: var(--hcdc-teal-light);
-      color: var(--hcdc-teal-dark);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    /* Responsive cho điện thoại */
-    @media (max-width: 768px) {
+      /* --- 2. CSS CHUNG --- */
       body {
-        padding-top: 160px;
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-dark);
+        margin: 0;
+        padding-top: 140px;
+        /* Khoảng trống cho fixed header */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
       }
 
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
-
+      /* --- 3. HEADER & THANH TÌM KIẾM CỐ ĐỊNH --- */
       .fixed-header {
-        padding: 10px 15px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        padding: 15px 20px;
+        text-align: center;
+        border-bottom: 3px solid var(--hcdc-teal);
       }
 
       .brand-title {
-        font-size: 1.2rem;
+        color: var(--hcdc-teal);
+        margin: 0 0 10px 0;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Giả lập icon logo nhỏ bên cạnh tiêu đề */
+      .brand-title::before {
+        content: '';
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        background: conic-gradient(var(--hcdc-teal) 0% 70%, var(--hcdc-orange) 70% 100%);
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+
+      .brand-subtitle {
+        margin: 0 0 15px 0;
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      .search-box-container {
+        max-width: 700px;
+        margin: 0 auto;
+        position: relative;
       }
 
       #searchInput {
+        width: 100%;
+        padding: 12px 20px;
+        padding-left: 45px;
+        /* Chỗ cho icon tìm kiếm */
+        border-radius: 25px;
+        border: 2px solid var(--hcdc-teal-light);
+        font-size: 1rem;
+        outline: none;
+        background-color: var(--bg-body);
+        transition: all 0.3s;
+      }
+
+      /* Icon kính lúp giả bằng CSS */
+      .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--hcdc-teal);
+        font-size: 1.2rem;
+      }
+
+      #searchInput:focus {
+        border-color: var(--hcdc-teal);
+        box-shadow: 0 0 0 3px rgba(0, 139, 153, 0.2);
+        background-color: var(--white);
+      }
+
+      /* --- 4. NỘI DUNG CHÍNH (GRID LAYOUT) --- */
+      .main-container {
+        width: 100%;
+        max-width: 1200px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+      }
+
+      .category-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-top: 4px solid var(--hcdc-teal);
+        height: fit-content;
+      }
+
+      .category-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--hcdc-teal-dark);
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--hcdc-teal-light);
+        display: flex;
+        align-items: center;
+      }
+
+      /* Thêm icon trước tên nhóm */
+      .category-header i {
+        margin-right: 10px;
+        color: var(--hcdc-orange);
+      }
+
+      .program-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .program-item {
+        background: var(--hcdc-teal-light);
+        color: var(--hcdc-teal-dark);
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        border-left: 3px solid transparent;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Hiệu ứng khi di chuột vào chương trình */
+      .program-item:hover {
+        background: var(--hcdc-teal);
+        color: var(--white);
+        transform: translateX(5px);
+        border-left: 3px solid var(--hcdc-orange);
+        box-shadow: 2px 4px 8px rgba(0, 139, 153, 0.3);
+      }
+
+      /* Số thứ tự chương trình */
+      .prog-id {
+        font-weight: bold;
+        margin-right: 8px;
+        color: var(--hcdc-orange);
+      }
+
+      .program-item:hover .prog-id {
+        color: var(--white);
+      }
+
+      /* --- 5. MODAL (CỬA SỔ CHI TIẾT) --- */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(2px);
+        /* Làm mờ nền */
+      }
+
+      .modal-box {
+        background: var(--white);
+        width: 900px;
+        max-width: 95%;
+        border-radius: 15px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        /* Hiệu ứng trượt lên */
+        animation: slideUp 0.4s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        background: var(--hcdc-teal);
+        color: var(--white);
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-title-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .close-btn:hover {
+        color: var(--hcdc-orange);
+        transform: rotate(90deg);
+      }
+
+      .modal-tabs {
+        display: flex;
+        background: #f0f0f0;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--text-light);
+        background: transparent;
+        transition: all 0.3s;
+        font-family: 'Roboto', sans-serif;
+      }
+
+      /* Tab đang được chọn */
+      .tab-btn.active {
+        background: var(--white);
+        color: var(--hcdc-teal-dark);
+        /* Dùng màu cam cho active tab để nổi bật */
+        border-bottom: 4px solid var(--hcdc-orange);
+      }
+
+      .modal-content-body {
+        padding: 25px;
+        overflow-y: auto;
+        line-height: 1.6;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .info-box {
+        background: var(--bg-body);
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid var(--hcdc-teal);
+      }
+
+      .info-label {
+        font-weight: 700;
+        color: var(--hcdc-teal-dark);
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .task-list ul {
+        padding-left: 20px;
+        color: var(--text-dark);
+      }
+
+      .task-list li {
+        margin-bottom: 8px;
+      }
+
+      .unit-tag {
+        display: inline-block;
+        background: var(--hcdc-teal-light);
+        color: var(--hcdc-teal-dark);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
         font-size: 0.9rem;
-        padding: 10px 15px 10px 40px;
+        margin-top: 5px;
       }
-    }
-  </style>
-</head>
 
-<body>
-
-  <div class="fixed-header">
-    <div class="brand-title">Hệ thống Tra cứu Chương trình Sức khỏe</div>
-    <p class="brand-subtitle">Dành cho Trạm Y tế Phường, Xã, Đặc khu</p>
-    <div class="search-box-container">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="Nhập tên chương trình, từ khóa (VD: tiêm chủng, người cao tuổi, HIV...)" onkeyup="filterPrograms()">
-    </div>
-  </div>
-
-  <div class="main-container">
-    <div class="category-card">
-      <div class="category-header">🥗 Dinh dưỡng & Lối sống lành mạnh</div>
-      <div class="program-list" id="group-1"></div>
-    </div>
-    <div class="category-card">
-      <div class="category-header">🏙️ Môi trường & Nghề nghiệp</div>
-      <div class="program-list" id="group-2"></div>
-    </div>
-    <div class="category-card">
-      <div class="category-header">❤️ Bệnh không lây nhiễm (NCDs)</div>
-      <div class="program-list" id="group-3"></div>
-    </div>
-    <div class="category-card">
-      <div class="category-header">🦠 Bệnh truyền nhiễm & Tiêm chủng</div>
-      <div class="program-list" id="group-4"></div>
-    </div>
-    <div class="category-card">
-      <div class="category-header">👨‍👩‍👧‍👦 Sức khỏe nhóm đặc thù</div>
-      <div class="program-list" id="group-5"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-box">
-      <div class="modal-header">
-        <span class="modal-title-text" id="modalTitle">Tên chương trình</span>
-        <button class="close-btn" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-tabs">
-        <button class="tab-btn active" onclick="switchTab('overview')">ℹ️ Tổng quan & Mục tiêu</button>
-        <button class="tab-btn" onclick="switchTab('tasks')">📋 Nhiệm vụ cụ thể tại TYT</button>
-        <button class="tab-btn" onclick="switchTab('coop')">🤝 Phối hợp liên ngành</button>
-      </div>
-      <div class="modal-body modal-content-body">
-        <div id="tab-overview" class="content-section">
-          <div class="info-grid">
-            <div class="info-box" style="grid-column: span 2;">
-              <span class="info-label">🎯 Mục tiêu chính:</span>
-              <p id="p-goal" style="margin: 5px 0;">...</p>
-            </div>
-            <div class="info-box">
-              <span class="info-label">👥 Đối tượng tác động:</span>
-              <p id="p-target" style="margin: 5px 0;">...</p>
-            </div>
-            <div class="info-box">
-              <span class="info-label">🏢 Đơn vị đầu mối phụ trách:</span>
-              <span id="p-lead" class="unit-tag">HCDC</span>
-            </div>
-          </div>
-        </div>
-
-        <div id="tab-tasks" class="content-section hidden">
-          <h3 style="color: var(--hcdc-teal-dark); margin-top: 0;">Các nhiệm vụ trọng tâm của Trạm Y tế:</h3>
-          <div class="task-list">
-            <ul id="p-tasks-tyt">
-              <li>Đang tải dữ liệu...</li>
-            </ul>
-          </div>
-        </div>
-
-        <div id="tab-coop" class="content-section hidden">
-          <div class="info-box" style="margin-bottom: 15px;">
-            <span class="info-label">🔗 Đơn vị phối hợp liên quan:</span>
-            <p id="p-coop-units">...</p>
-          </div>
-          <h4 style="color: var(--hcdc-teal-dark);">Nhiệm vụ của các đơn vị phối hợp:</h4>
-          <div class="task-list" style="background: #eee; padding: 15px; border-radius: 8px;">
-            <ul id="p-tasks-coop">
-              <li>...</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('PWA đã sẵn sàng!'))
-          .catch(err => console.log('Lỗi PWA:', err));
-      });
-    }
-    // --- CƠ SỞ DỮ LIỆU 22 CHƯƠNG TRÌNH ---
-    // Dữ liệu được trích xuất từ file CSV bạn cung cấp.
-    // Các mục từ 13-22 đang để trống nội dung để cập nhật sau.
-    const db = [
-      // NHÓM 1: Dinh dưỡng & Lối sống
-      {
-        id: 1,
-        group: 1,
-        name: "Dinh dưỡng",
-        goal: "Thực hiện dinh dưỡng hợp lý để giảm suy dinh dưỡng bền vững, hạn chế tình trạng thừa cân béo phì và kiểm soát có hiệu quả các bệnh không lây nhiễm liên quan đến dinh dưỡng góp phần nâng cao sức khỏe tầm vóc, thể lực và trí lực của người dân Thành phố.",
-        target: "Toàn dân, ưu tiên bà mẹ, trẻ em, người mắc bệnh không lây nhiễm và người cao tuổi.",
-        lead: "Khoa DD-BKL ",
-        tasksTYT: tasksTYT: [
-    "Xây dựng kế hoạch và triển khai các hoạt động dinh dưỡng tại cộng đồng: ",
-    "Tổ chức truyền thông, tư vấn dinh dưỡng hợp lý cho các đối tượng. ",
-    "Hoạt động can thiệp: theo dõi tăng trưởng của trẻ em; theo dõi và tư vấn can thiệp dinh dưỡng cho trẻ SDD, người béo phì, người mắc BKLN tại cộng đồng; bổ sung vi chất dinh dưỡng cho các đối tượng nguy cơ. ",
-    "Tổ chức tập huấn cho mạng lưới tại địa phương. ",
-    "Giám sát và báo cáo định kỳ. "
-  ],
-        coopUnits: "TYT phường, xã, đặc khu ",
-        tasksCoop: ["Tổ chức tập huấn cho mạng lưới tại địa phương .", "Giám sát và báo cáo định kỳ."]
-      },
-      {
-        id: 2,
-        group: 1,
-        name: "Phòng, chống tác hại rượu bia",
-        goal: "Tăng cường truyền thông, sàng lọc phát hiện sớm, tư vấn và can thiệp nhằm giảm tác hại do uống rượu bia cho người dân trong cộng đồng.",
-        target: "Người dân từ 13 tuổi trở lên trong cộng đồng, tập trung đối tượng người đã và đang sử dụng rượu bia.",
-        lead: "HCDC ",
-        tasksTYT: ["Truyền thông, giáo dục nhằm nâng cao nhận thức, thay đổi thói quen có hại cho các đối tượng."],
-        coopUnits: "TYT phường, xã, đặc khu ",
-        tasksCoop: ["Sàng lọc, phát hiện sớm và can thiệp ban đầu để dự phòng, giảm nguy cơ và tác hại đối với sức khỏe do uống rượu, bia."]
-      },
-      {
-        id: 3,
-        group: 1,
-        name: "Phòng, chống tác hại thuốc lá",
-        goal: "Thực hiện nghiêm các quy định của Luật PCTH thuốc lá... giảm tỉ lệ hút thuốc; nâng cao kiến thức và ý thức tuân thủ quy định cấm hút thuốc.",
-        target: "Người từ 13 tuổi trở lên.",
-        lead: "HCDC ",
-        tasksTYT: ["Xây dựng và triển khai kế hoạch PCTH thuốc lá. Thành lập/kiện toàn Ban Chỉ đạo tại TYT .", "Truyền thông PCTH thuốc lá tại cộng đồng."],
-        coopUnits: "UBND phường xã, bệnh viện, trường học... ",
-        tasksCoop: ["Thực hiện mô hình cơ sở không khói thuốc. Lồng ghép tư vấn cai nghiện .", "Kiểm tra, giám sát thực hiện quy định."]
-      },
-      // NHÓM 2: Môi trường & Nghề nghiệp
-      {
-        id: 4,
-        group: 2,
-        name: "Giám sát chất lượng nước sạch sinh hoạt",
-        goal: "Đảm bảo chất lượng nước sạch sinh hoạt; nâng cao ý thức tiết kiệm nước, sử dụng nước an toàn.",
-        target: "Toàn dân cư trên địa bàn Thành phố.",
-        lead: "Khoa SKCĐ-MT- BNN ",
-        tasksTYT: ["Xây dựng kế hoạch, kinh phí kiểm tra, giám sát, ngoại kiểm chất lượng nước sạch trình cấp có thẩm quyền phê duyệt.", "Kiểm tra, giám sát, ngoại kiểm định kỳ, đột xuất chất lượng nước sạch của các đơn vị cấp nước có công suất dưới 1.000m3/ ngày đêm trên địa bàn.", "Kiểm tra, giám sát và phối hợp HCDC ngoại kiểm chất lượng nước sạch của các đơn vị sử dụng nước.", "Tổng hợp báo cáo nội kiểm của các đơn vị cấp nước có công suất dưới 1.000m3/ ngày đêm. Báo cáo HCDC hằng quý; 6 tháng; hằng năm.", "Có kế hoạch truyền thông vận động người dân nâng cao ý thức bảo vệ tài nguyên nước, sử dụng nước sạch cho mục đích sinh hoạt.", "Hướng dẫn BQL chung cư trên địa bàn về chế độ kiểm tra chất lượng nước sạch định kỳ, chế độ vệ sinh bể chứa…"],
-        coopUnits: "Các cơ sở cấp nước, đơn vị sử dụng nước... ",
-        tasksCoop: ["Phối hợp HCDC ngoại kiểm chất lượng nước .", "Tổng hợp báo cáo nội kiểm."]
-      },
-      {
-        id: 5,
-        group: 2,
-        name: "Quản lý chất thải y tế",
-        goal: "Thực hiện tốt công tác quản lý chất thải y tế, giảm thiểu chất thải nhựa, giảm thiểu ô nhiễm.",
-        target: "Nhân viên trong cơ sở y tế, bệnh nhân, thân nhân người bệnh, cộng đồng.",
-        lead: "Khoa SKCĐ-MT- BNN",
-        tasksTYT: ["Xây dựng kế hoạch, dự trù kinh phí cho công tác quản lý chất thải y tế, giảm thiểu chất thải nhựa, giảm thiểu ô nhiễm, phòng ngừa và ứng phó sự cố môi trường do chất thải y tế gây ra","Phân công lãnh đạo phụ trách, khoa phòng phụ trách, nhân sự phụ trách công tác quản lý chất thải y tế.","Tập huấn và truyền thông về quản lý chất thải y tế, giảm thiểu chất thải cho nhân viên trong cơ sở y tế, bệnh nhân, thân nhân người bệnh, và cộng đồng dân cư xung quanh.","Thực hiện và lưu giữ các hồ sơ môi trường, hồ sơ về quản lý chất thải y tế.","Thực hiện phân loại, thu gom và xử lý chất thải y tế đúng quy định trong thông tư 20/2021/TT-BYT và các văn bản có liên quan.","Thực hiện quan trắc môi trường theo đúng quy định.","Thực hiện báo cáo quản lý chất thải y tế, giảm thiểu chất thải nhựa, giảm thiểu ô nhiễm và các báo cáo đột xuất theo yêu cầu của Sở Y tế."],
-        coopUnits: "Đang cập nhật...",
-        tasksCoop: ["Đang cập nhật..."]
-      },
-      {
-        id: 6,
-        group: 2,
-        name: "Ứng phó với biến đổi khí hậu",
-        goal: "Nâng cao nhận thức và hành động thích ứng với tác động môi trường (nắng nóng, mưa ngập, ô nhiễm không khí).",
-        target: "Cộng đồng, ưu tiên đối tượng dễ bị tổn thương (người già, trẻ em, bệnh nền...).",
-        lead: "Khoa SKCĐ-MT- BNN ",
-        tasksTYT: ["Thực hiện các biện pháp truyền thông, tập huấn từ nguồn tài liệu của HCDC .", "Triển khai các phần mềm dự báo dưới sự hướng dẫn của HCDC."],
-        coopUnits: "Các cơ sở y tế trên địa bàn ",
-        tasksCoop: ["Chưa có chỉ tiêu cụ thể xuống TYT, nhiệm vụ chính do HCDC đảm nhiệm."]
-      },
-      {
-        id: 13,
-        group: 2,
-        name: "Sức khỏe người lao động & Bệnh nghề nghiệp",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      // NHÓM 3: Bệnh không lây nhiễm (NCDs)
-      {
-        id: 7,
-        group: 3,
-        name: "Phòng, chống bệnh không lây nhiễm",
-        goal: "Kiểm soát yếu tố nguy cơ, dự phòng, phát hiện sớm và quản lý điều trị các bệnh tim mạch, ung thư, đái tháo đường.",
-        target: "Toàn dân, ưu tiên người từ 40 tuổi trở lên.",
-        lead: "HCDC ",
-        tasksTYT: ["Đang cập nhật chi tiết nhiệm vụ từ file nguồn..."],
-        coopUnits: "TYT phường, xã, đặc khu ",
-        tasksCoop: ["Đang cập nhật..."]
-      },
-      {
-        id: 15,
-        group: 3,
-        name: "Phòng, chống tai nạn thương tích",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 18,
-        group: 3,
-        name: "Phòng, chống COPD & Hen phế quản",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 21,
-        group: 3,
-        name: "Chăm sóc sức khỏe tâm thần cộng đồng",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 22,
-        group: 3,
-        name: "Phòng, chống mù lòa",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      // NHÓM 4: Bệnh truyền nhiễm & Tiêm chủng
-      {
-        id: 8,
-        group: 4,
-        name: "Phòng, chống HIV/AIDS",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "HCDC",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 9,
-        group: 4,
-        name: "Phòng, chống dịch bệnh truyền nhiễm",
-        goal: "Kiểm soát dịch bệnh truyền nhiễm hiệu quả, hạn chế tối đa ca tử vong.",
-        target: "Toàn dân cư trên địa bàn Thành phố.",
-        lead: "Khoa PCBTNCT ",
-        tasksTYT: ["Giám sát dựa vào sự kiện, chủ động phát hiện ca bệnh cộng đồng .", "Điều tra, xử lý ổ dịch, khoanh vùng (cộng đồng, trường học, xí nghiệp) .", "Truyền thông nguy cơ và biện pháp phòng chống dịch .", "Tham mưu cho UBND kiện toàn BCĐ phòng chống dịch."],
-        coopUnits: "UBND, Cơ sở KCB, Trường học, Chi cục Thú y ",
-        tasksCoop: ["UBND: Chỉ đạo, kiểm tra, xử phạt vi phạm .", "Cơ sở KCB: Phát hiện, báo cáo, điều trị ca bệnh .", "Trường học: Phát hiện ca bệnh, rà soát tiêm chủng."]
-      },
-      {
-        id: 10,
-        group: 4,
-        name: "Tiêm chủng mở rộng",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "HCDC",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 14,
-        group: 4,
-        name: "Phòng, chống viêm gan vi rút",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 17,
-        group: 4,
-        name: "Phòng, chống bệnh lao",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 19,
-        group: 4,
-        name: "Phòng, chống bệnh phong",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      {
-        id: 20,
-        group: 4,
-        name: "Phòng, chống nhiễm khuẩn lây qua đường tình dục",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
-      },
-      // NHÓM 5: Sức khỏe nhóm đặc thù
-      {
-        id: 11,
-        group: 5,
-        name: "Chăm sóc sức khỏe sinh sản",
-        goal: "Cải thiện SKSS, tập trung vào bà mẹ, trẻ sơ sinh/nhỏ. Loại trừ lây truyền mẹ con (HIV, Viêm gan B, giang mai). Cải thiện SKSS vị thành niên.",
-        target: "Phụ nữ mang thai, bà mẹ, trẻ sơ sinh, trẻ nhỏ và vị thành niên - thanh niên.",
-        lead: "HCDC ",
-        tasksTYT: ["Quản lý thai sản, chăm sóc sức khỏe bà mẹ, trẻ em trên địa bàn .", "Cung cấp dịch vụ sản phụ khoa, KHHGĐ, khám sức khỏe định kỳ trẻ em .", "Truyền thông về CSSK bà mẹ trẻ em."],
-        coopUnits: "Các cơ sở y tế có sản phụ khoa/nhi ",
-        tasksCoop: ["Tham dự tập huấn, giao ban mạng lưới."]
-      },
-      {
-        id: 12,
-        group: 5,
-        name: "Y tế trường học",
-        goal: "Nhằm tăng cường công tác bảo vệ, giáo dục và chăm sóc sức khỏe trẻ em, học sinh, học viên, sinh viên (sau đây gọi là người học) trong các cơ sở giáo dục mầm non, giáo dục phổ thông, giáo dục đại học, giáo dục nghề nghiệp (sau đây gọi là cơ sở giáo dục); bảo đảm sức khỏe cho tất cả người học trên địa bàn Thành phố; góp phần giảm tỷ lệ mắc bệnh, kiểm soát và hạn chế các yếu tố nguy cơ phát sinh và gia tăng của các bệnh truyền nhiễm; phát hiện sớm bệnh tật học đường phổ biến hiện nay nhằm nâng cao sức khỏe người học.",
-        target: "Các cơ sở giáo dục, học sinh từ mầm non đến phổ thông.",
-        lead: "Khoa SKCĐ-MT- BNN",
-        tasksTYT: [
-          "Xây dựng kế hoạch, kinh phí chương trình YTTH trình cấp có thẩm quyền phê duyệt. ",
-          "Xây dựng và ký kết quy chế phối hợp về công tác YTTH của TYT và cơ sở giáo dục. ",
-          "Phân công cán bộ phụ trách công tác YTTH. ",
-          "Hỗ trợ chuyên môn kỹ thuật cho các cơ sở giáo dục trên địa bàn. ",
-          "Tham gia đầy đủ lớp bồi dưỡng về công tác YTTH cho cán bộ phụ trách do tuyến trên tổ chức. ",
-          "Tổ chức tập huấn về công tác YTTH cho nhân viên y tế trường học. ",
-          "Quản lý lịch khám, tên cơ sở thực hiện khám sức khỏe học sinh của các trường. ",
-          "Hướng dẫn đánh giá phát hiện sớm yếu tố nguy cơ BKLN và sức khỏe tâm thần học sinh. ",
-          "Truyền thông chuyên đề về bệnh tật học đường và nâng cao kiến thức phòng chống bệnh tật. ",
-          "Truyền tải tài liệu truyền thông (video, poster,...) đến các trường. ",
-          "Tổng hợp báo cáo từ các cơ sở giáo dục theo quy định. ",
-          "Lập danh sách nhu cầu cấp bảng kiểm tra thị lực gửi Bệnh viện Mắt; nhận và cấp phát bảng cho trường. ",
-          "Tổng hợp báo cáo sàng lọc thị lực học sinh (quan tâm số liệu giảm thị lực được kê đơn kính) gửi Bệnh viện Mắt định kỳ. ",
-          "Theo dõi, tổng hợp số liệu báo cáo về giáo dục sức khỏe răng miệng và chải răng với kem có fluor. ",
-          "Triển khai mô hình trường - trạm trong chăm sóc sức khỏe răng miệng học sinh theo chỉ đạo. ",
-          "Giám sát hoạt động YTTH tại các cơ sở giáo dục (01 lần/năm). ",
-          "Lồng ghép đánh giá sơ kết, tổng kết về công tác YTTH và chăm sóc sức khỏe học sinh. "
-        ],
-        coopUnits: "Trạm Y tế; Các cơ sở giáo dục;Uỷ ban nhân dân xã phường;",
-        tasksCoop: ["Rà soát, cấp phát bảng kiểm tra thị lực. Tổng hợp báo cáo sàng lọc thị lực .", "Triển khai giáo dục nha học đường, chải răng có fluor."]
-      },
-      {
-        id: 16,
-        group: 5,
-        name: "Phục hồi chức năng dựa vào cộng đồng",
-        goal: "Đang cập nhật...",
-        target: "Đang cập nhật...",
-        lead: "Đang cập nhật...",
-        tasksTYT: ["Đang cập nhật nội dung..."],
-        coopUnits: "...",
-        tasksCoop: ["..."]
+      .hidden {
+        display: none;
       }
-    ];
-    // --- CÁC HÀM XỬ LÝ GIAO DIỆN (JAVASCRIPT) ---
-    // 1. Hàm khởi tạo: Vẽ danh sách chương trình ra màn hình
-    function initDashboard() {
-      db.forEach(item => {
-        // Tìm đúng cột nhóm để nhét chương trình vào
-        const container = document.getElementById(`group-${item.group}`);
-        if (container) {
-          const div = document.createElement('div');
-          div.className = 'program-item';
-          // Tạo nội dung thẻ: Số thứ tự + Tên
-          div.innerHTML = `<span class="prog-id">#${item.id}</span> ${item.name}`;
-          // Gán sự kiện click để mở modal
-          div.onclick = () => openModalDetails(item);
-          container.appendChild(div);
+
+      /* Responsive cho điện thoại */
+      @media (max-width: 768px) {
+        body {
+          padding-top: 160px;
         }
-      });
-    }
-    // 2. Hàm tìm kiếm (Lọc theo thời gian thực)
-    function filterPrograms() {
-      const inputStr = document.getElementById('searchInput').value.toLowerCase();
-      const allItems = document.querySelectorAll('.program-item');
-      allItems.forEach(item => {
-        const textContent = item.innerText.toLowerCase();
-        // Nếu từ khóa có trong tên chương trình thì hiện, không thì ẩn
-        if (textContent.includes(inputStr)) {
-          item.style.display = 'flex';
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .fixed-header {
+          padding: 10px 15px;
+        }
+
+        .brand-title {
+          font-size: 1.2rem;
+        }
+
+        #searchInput {
+          font-size: 0.9rem;
+          padding: 10px 15px 10px 40px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="fixed-header">
+      <div class="brand-title">Hệ thống Tra cứu Chương trình Sức khỏe</div>
+      <p class="brand-subtitle">Dành cho Trạm Y tế Phường, Xã, Đặc khu</p>
+      <div class="search-box-container">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Nhập tên chương trình, từ khóa (VD: tiêm chủng, người cao tuổi, HIV...)"
+          onkeyup="filterPrograms()"
+        />
+      </div>
+    </div>
+
+    <div class="main-container">
+      <div class="category-card">
+        <div class="category-header">🥗 Dinh dưỡng & Lối sống lành mạnh</div>
+        <div class="program-list" id="group-1"></div>
+      </div>
+      <div class="category-card">
+        <div class="category-header">🏙️ Môi trường & Nghề nghiệp</div>
+        <div class="program-list" id="group-2"></div>
+      </div>
+      <div class="category-card">
+        <div class="category-header">❤️ Bệnh không lây nhiễm (NCDs)</div>
+        <div class="program-list" id="group-3"></div>
+      </div>
+      <div class="category-card">
+        <div class="category-header">🦠 Bệnh truyền nhiễm & Tiêm chủng</div>
+        <div class="program-list" id="group-4"></div>
+      </div>
+      <div class="category-card">
+        <div class="category-header">👨‍👩‍👧‍👦 Sức khỏe nhóm đặc thù</div>
+        <div class="program-list" id="group-5"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-title-text" id="modalTitle">Tên chương trình</span>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="tab-btn active" onclick="switchTab('overview')">
+            ℹ️ Tổng quan & Mục tiêu
+          </button>
+          <button class="tab-btn" onclick="switchTab('tasks')">
+            📋 Nhiệm vụ cụ thể tại TYT
+          </button>
+          <button class="tab-btn" onclick="switchTab('coop')">
+            🤝 Phối hợp liên ngành
+          </button>
+        </div>
+        <div class="modal-body modal-content-body">
+          <div id="tab-overview" class="content-section">
+            <div class="info-grid">
+              <div class="info-box" style="grid-column: span 2;">
+                <span class="info-label">🎯 Mục tiêu chính:</span>
+                <p id="p-goal" style="margin: 5px 0;">...</p>
+              </div>
+              <div class="info-box">
+                <span class="info-label">👥 Đối tượng tác động:</span>
+                <p id="p-target" style="margin: 5px 0;">...</p>
+              </div>
+              <div class="info-box">
+                <span class="info-label">🏢 Đơn vị đầu mối phụ trách:</span>
+                <span id="p-lead" class="unit-tag">HCDC</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-tasks" class="content-section hidden">
+            <h3 style="color: var(--hcdc-teal-dark); margin-top: 0;">
+              Các nhiệm vụ trọng tâm của Trạm Y tế:
+            </h3>
+            <div class="task-list">
+              <ul id="p-tasks-tyt">
+                <li>Đang tải dữ liệu...</li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="tab-coop" class="content-section hidden">
+            <div class="info-box" style="margin-bottom: 15px;">
+              <span class="info-label">🔗 Đơn vị phối hợp liên quan:</span>
+              <p id="p-coop-units">...</p>
+            </div>
+            <h4 style="color: var(--hcdc-teal-dark);">
+              Nhiệm vụ của các đơn vị phối hợp:
+            </h4>
+            <div
+              class="task-list"
+              style="background: #eee; padding: 15px; border-radius: 8px;"
+            >
+              <ul id="p-tasks-coop">
+                <li>...</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('PWA đã sẵn sàng!'))
+            .catch(err => console.log('Lỗi PWA:', err));
+        });
+      }
+      // --- CƠ SỞ DỮ LIỆU 22 CHƯƠNG TRÌNH ---
+      // Dữ liệu được trích xuất từ file CSV bạn cung cấp.
+      // Các mục từ 13-22 đang để trống nội dung để cập nhật sau.
+      const db = [
+        // NHÓM 1: Dinh dưỡng & Lối sống
+        {
+          id: 1,
+          group: 1,
+          name: "Dinh dưỡng",
+          goal: "Thực hiện dinh dưỡng hợp lý để giảm suy dinh dưỡng bền vững, hạn chế tình trạng thừa cân béo phì và kiểm soát có hiệu quả các bệnh không lây nhiễm liên quan đến dinh dưỡng góp phần nâng cao sức khỏe tầm vóc, thể lực và trí lực của người dân Thành phố.",
+          target: "Toàn dân, ưu tiên bà mẹ, trẻ em, người mắc bệnh không lây nhiễm và người cao tuổi.",
+          lead: "Khoa DD-BKL ",
+          tasksTYT: ["Xây dựng kế hoạch và triển khai các hoạt động dinh dưỡng tại cộng đồng: ","Tổ chức truyền thông, tư vấn dinh dưỡng hợp lý cho các đối tượng. ","Hoạt động can thiệp: theo dõi tăng trưởng của trẻ em; theo dõi và tư vấn can thiệp dinh dưỡng cho trẻ SDD, người béo phì, người mắc BKLN tại cộng đồng; bổ sung vi chất dinh dưỡng cho các đối tượng nguy cơ. ","Tổ chức tập huấn cho mạng lưới tại địa phương. ","Giám sát và báo cáo định kỳ. "],
+          coopUnits: "TYT phường, xã, đặc khu ",
+          tasksCoop: ["Tổ chức tập huấn cho mạng lưới tại địa phương .", "Giám sát và báo cáo định kỳ."]
+        },
+        {
+          id: 2,
+          group: 1,
+          name: "Phòng, chống tác hại rượu bia",
+          goal: "Tăng cường truyền thông, sàng lọc phát hiện sớm, tư vấn và can thiệp nhằm giảm tác hại do uống rượu bia cho người dân trong cộng đồng.",
+          target: "Người dân từ 13 tuổi trở lên trong cộng đồng, tập trung đối tượng người đã và đang sử dụng rượu bia.",
+          lead: "Khoa TTGDSK ",
+          tasksTYT: ["Truyền thông, giáo dục nhằm nâng cao nhận thức, thay đổi thói quen có hại cho các đối tượng."],
+          coopUnits: "TYT phường, xã, đặc khu ",
+          tasksCoop: ["Sàng lọc, phát hiện sớm và can thiệp ban đầu để dự phòng, giảm nguy cơ và tác hại đối với sức khỏe do uống rượu, bia."]
+        },
+        {
+          id: 3,
+          group: 1,
+          name: "Phòng, chống tác hại thuốc lá",
+          goal: "Thực hiện nghiêm các quy định của Luật PCTH thuốc lá... giảm tỉ lệ hút thuốc; nâng cao kiến thức và ý thức tuân thủ quy định cấm hút thuốc.",
+          target: "Người từ 13 tuổi trở lên.",
+          lead: "HCDC ",
+          tasksTYT: ["Xây dựng và triển khai kế hoạch PCTH thuốc lá. Thành lập/kiện toàn Ban Chỉ đạo tại TYT .", "Truyền thông PCTH thuốc lá tại cộng đồng."],
+          coopUnits: "UBND phường xã, bệnh viện, trường học... ",
+          tasksCoop: ["Thực hiện mô hình cơ sở không khói thuốc. Lồng ghép tư vấn cai nghiện .", "Kiểm tra, giám sát thực hiện quy định."]
+        },
+        // NHÓM 2: Môi trường & Nghề nghiệp
+        {
+          id: 4,
+          group: 2,
+          name: "Giám sát chất lượng nước sạch sinh hoạt",
+          goal: "Đảm bảo chất lượng nước sạch sinh hoạt; nâng cao ý thức tiết kiệm nước, sử dụng nước an toàn.",
+          target: "Toàn dân cư trên địa bàn Thành phố.",
+          lead: "Khoa SKCĐ-MT- BNN ",
+          tasksTYT: ["Xây dựng kế hoạch, kinh phí kiểm tra, giám sát, ngoại kiểm chất lượng nước sạch trình cấp có thẩm quyền phê duyệt.", "Kiểm tra, giám sát, ngoại kiểm định kỳ, đột xuất chất lượng nước sạch của các đơn vị cấp nước có công suất dưới 1.000m3/ ngày đêm trên địa bàn.", "Kiểm tra, giám sát và phối hợp HCDC ngoại kiểm chất lượng nước sạch của các đơn vị sử dụng nước.", "Tổng hợp báo cáo nội kiểm của các đơn vị cấp nước có công suất dưới 1.000m3/ ngày đêm. Báo cáo HCDC hằng quý; 6 tháng; hằng năm.", "Có kế hoạch truyền thông vận động người dân nâng cao ý thức bảo vệ tài nguyên nước, sử dụng nước sạch cho mục đích sinh hoạt.", "Hướng dẫn BQL chung cư trên địa bàn về chế độ kiểm tra chất lượng nước sạch định kỳ, chế độ vệ sinh bể chứa…"],
+          coopUnits: "Các cơ sở cấp nước, đơn vị sử dụng nước... ",
+          tasksCoop: ["Phối hợp HCDC ngoại kiểm chất lượng nước .", "Tổng hợp báo cáo nội kiểm."]
+        },
+        {
+          id: 5,
+          group: 2,
+          name: "Quản lý chất thải y tế",
+          goal: "Thực hiện tốt công tác quản lý chất thải y tế, giảm thiểu chất thải nhựa, giảm thiểu ô nhiễm.",
+          target: "Nhân viên trong cơ sở y tế, bệnh nhân, thân nhân người bệnh, cộng đồng.",
+          lead: "Khoa SKCĐ-MT- BNN",
+          tasksTYT: ["Xây dựng kế hoạch, dự trù kinh phí cho công tác quản lý chất thải y tế, giảm thiểu chất thải nhựa, giảm thiểu ô nhiễm, phòng ngừa và ứng phó sự cố môi trường do chất thải y tế gây ra", "Phân công lãnh đạo phụ trách, khoa phòng phụ trách, nhân sự phụ trách công tác quản lý chất thải y tế.", "Tập huấn và truyền thông về quản lý chất thải y tế, giảm thiểu chất thải cho nhân viên trong cơ sở y tế, bệnh nhân, thân nhân người bệnh, và cộng đồng dân cư xung quanh.", "Thực hiện và lưu giữ các hồ sơ môi trường, hồ sơ về quản lý chất thải y tế.", "Thực hiện phân loại, thu gom và xử lý chất thải y tế đúng quy định trong thông tư 20/2021/TT-BYT và các văn bản có liên quan.", "Thực hiện quan trắc môi trường theo đúng quy định.", "Thực hiện báo cáo quản lý chất thải y tế, giảm thiểu chất thải nhựa, giảm thiểu ô nhiễm và các báo cáo đột xuất theo yêu cầu của Sở Y tế."],
+          coopUnits: "Đang cập nhật...",
+          tasksCoop: ["Đang cập nhật..."]
+        },
+        {
+          id: 6,
+          group: 2,
+          name: "Ứng phó với biến đổi khí hậu",
+          goal: "Nâng cao nhận thức và hành động thích ứng với tác động môi trường (nắng nóng, mưa ngập, ô nhiễm không khí).",
+          target: "Cộng đồng, ưu tiên đối tượng dễ bị tổn thương (người già, trẻ em, bệnh nền...).",
+          lead: "Khoa SKCĐ-MT- BNN ",
+          tasksTYT: ["Thực hiện các biện pháp truyền thông, tập huấn từ nguồn tài liệu của HCDC .", "Triển khai các phần mềm dự báo dưới sự hướng dẫn của HCDC."],
+          coopUnits: "Các cơ sở y tế trên địa bàn ",
+          tasksCoop: ["Chưa có chỉ tiêu cụ thể xuống TYT, nhiệm vụ chính do HCDC đảm nhiệm."]
+        },
+        {
+          id: 13,
+          group: 2,
+          name: "Sức khỏe người lao động & Bệnh nghề nghiệp",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        // NHÓM 3: Bệnh không lây nhiễm (NCDs)
+        {
+          id: 7,
+          group: 3,
+          name: "Phòng, chống bệnh không lây nhiễm",
+          goal: "Kiểm soát yếu tố nguy cơ, dự phòng, phát hiện sớm và quản lý điều trị các bệnh tim mạch, ung thư, đái tháo đường.",
+          target: "Toàn dân, ưu tiên người từ 40 tuổi trở lên.",
+          lead: "HCDC ",
+          tasksTYT: ["Đang cập nhật chi tiết nhiệm vụ từ file nguồn..."],
+          coopUnits: "TYT phường, xã, đặc khu ",
+          tasksCoop: ["Đang cập nhật..."]
+        },
+        {
+          id: 15,
+          group: 3,
+          name: "Phòng, chống tai nạn thương tích",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 18,
+          group: 3,
+          name: "Phòng, chống COPD & Hen phế quản",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 21,
+          group: 3,
+          name: "Chăm sóc sức khỏe tâm thần cộng đồng",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 22,
+          group: 3,
+          name: "Phòng, chống mù lòa",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        // NHÓM 4: Bệnh truyền nhiễm & Tiêm chủng
+        {
+          id: 8,
+          group: 4,
+          name: "Phòng, chống HIV/AIDS",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "HCDC",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 9,
+          group: 4,
+          name: "Phòng, chống dịch bệnh truyền nhiễm",
+          goal: "Kiểm soát dịch bệnh truyền nhiễm hiệu quả, hạn chế tối đa ca tử vong.",
+          target: "Toàn dân cư trên địa bàn Thành phố.",
+          lead: "Khoa PCBTNCT ",
+          tasksTYT: ["Giám sát dựa vào sự kiện, chủ động phát hiện ca bệnh cộng đồng .", "Điều tra, xử lý ổ dịch, khoanh vùng (cộng đồng, trường học, xí nghiệp) .", "Truyền thông nguy cơ và biện pháp phòng chống dịch .", "Tham mưu cho UBND kiện toàn BCĐ phòng chống dịch."],
+          coopUnits: "UBND, Cơ sở KCB, Trường học, Chi cục Thú y ",
+          tasksCoop: ["UBND: Chỉ đạo, kiểm tra, xử phạt vi phạm .", "Cơ sở KCB: Phát hiện, báo cáo, điều trị ca bệnh .", "Trường học: Phát hiện ca bệnh, rà soát tiêm chủng."]
+        },
+        {
+          id: 10,
+          group: 4,
+          name: "Tiêm chủng mở rộng",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "HCDC",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 14,
+          group: 4,
+          name: "Phòng, chống viêm gan vi rút",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 17,
+          group: 4,
+          name: "Phòng, chống bệnh lao",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 19,
+          group: 4,
+          name: "Phòng, chống bệnh phong",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        {
+          id: 20,
+          group: 4,
+          name: "Phòng, chống nhiễm khuẩn lây qua đường tình dục",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        },
+        // NHÓM 5: Sức khỏe nhóm đặc thù
+        {
+          id: 11,
+          group: 5,
+          name: "Chăm sóc sức khỏe sinh sản",
+          goal: "Cải thiện SKSS, tập trung vào bà mẹ, trẻ sơ sinh/nhỏ. Loại trừ lây truyền mẹ con (HIV, Viêm gan B, giang mai). Cải thiện SKSS vị thành niên.",
+          target: "Phụ nữ mang thai, bà mẹ, trẻ sơ sinh, trẻ nhỏ và vị thành niên - thanh niên.",
+          lead: "HCDC ",
+          tasksTYT: ["Quản lý thai sản, chăm sóc sức khỏe bà mẹ, trẻ em trên địa bàn .", "Cung cấp dịch vụ sản phụ khoa, KHHGĐ, khám sức khỏe định kỳ trẻ em .", "Truyền thông về CSSK bà mẹ trẻ em."],
+          coopUnits: "Các cơ sở y tế có sản phụ khoa/nhi ",
+          tasksCoop: ["Tham dự tập huấn, giao ban mạng lưới."]
+        },
+        {
+          id: 12,
+          group: 5,
+          name: "Y tế trường học",
+          goal: "Nhằm tăng cường công tác bảo vệ, giáo dục và chăm sóc sức khỏe trẻ em, học sinh, học viên, sinh viên (sau đây gọi là người học) trong các cơ sở giáo dục mầm non, giáo dục phổ thông, giáo dục đại học, giáo dục nghề nghiệp (sau đây gọi là cơ sở giáo dục); bảo đảm sức khỏe cho tất cả người học trên địa bàn Thành phố; góp phần giảm tỷ lệ mắc bệnh, kiểm soát và hạn chế các yếu tố nguy cơ phát sinh và gia tăng của các bệnh truyền nhiễm; phát hiện sớm bệnh tật học đường phổ biến hiện nay nhằm nâng cao sức khỏe người học.",
+          target: "Các cơ sở giáo dục, học sinh từ mầm non đến phổ thông.",
+          lead: "Khoa SKCĐ-MT- BNN",
+          tasksTYT: ["Xây dựng kế hoạch, kinh phí chương trình YTTH trình cấp có thẩm quyền phê duyệt. ","Xây dựng và ký kết quy chế phối hợp về công tác YTTH của TYT và cơ sở giáo dục. ","Phân công cán bộ phụ trách công tác YTTH. ","Hỗ trợ chuyên môn kỹ thuật cho các cơ sở giáo dục trên địa bàn. ","Tham gia đầy đủ lớp bồi dưỡng về công tác YTTH cho cán bộ phụ trách do tuyến trên tổ chức. ","Tổ chức tập huấn về công tác YTTH cho nhân viên y tế trường học. ","Quản lý lịch khám, tên cơ sở thực hiện khám sức khỏe học sinh của các trường. ","Hướng dẫn đánh giá phát hiện sớm yếu tố nguy cơ BKLN và sức khỏe tâm thần học sinh. ","Truyền thông chuyên đề về bệnh tật học đường và nâng cao kiến thức phòng chống bệnh tật. ","Truyền tải tài liệu truyền thông (video, poster,...) đến các trường. ","Tổng hợp báo cáo từ các cơ sở giáo dục theo quy định. ","Lập danh sách nhu cầu cấp bảng kiểm tra thị lực gửi Bệnh viện Mắt; nhận và cấp phát bảng cho trường. ","Tổng hợp báo cáo sàng lọc thị lực học sinh (quan tâm số liệu giảm thị lực được kê đơn kính) gửi Bệnh viện Mắt định kỳ. ","Theo dõi, tổng hợp số liệu báo cáo về giáo dục sức khỏe răng miệng và chải răng với kem có fluor. ","Triển khai mô hình trường - trạm trong chăm sóc sức khỏe răng miệng học sinh theo chỉ đạo. ","Giám sát hoạt động YTTH tại các cơ sở giáo dục (01 lần/năm). ","Lồng ghép đánh giá sơ kết, tổng kết về công tác YTTH và chăm sóc sức khỏe học sinh. "],
+          coopUnits: "Trạm Y tế; Các cơ sở giáo dục;Uỷ ban nhân dân xã phường;",
+          tasksCoop: ["Rà soát, cấp phát bảng kiểm tra thị lực. Tổng hợp báo cáo sàng lọc thị lực .", "Triển khai giáo dục nha học đường, chải răng có fluor."]
+        },
+        {
+          id: 16,
+          group: 5,
+          name: "Phục hồi chức năng dựa vào cộng đồng",
+          goal: "Đang cập nhật...",
+          target: "Đang cập nhật...",
+          lead: "Đang cập nhật...",
+          tasksTYT: ["Đang cập nhật nội dung..."],
+          coopUnits: "...",
+          tasksCoop: ["..."]
+        }
+      ];
+      // --- CÁC HÀM XỬ LÝ GIAO DIỆN (JAVASCRIPT) ---
+      // 1. Hàm khởi tạo: Vẽ danh sách chương trình ra màn hình
+      function initDashboard() {
+        db.forEach(item => {
+          // Tìm đúng cột nhóm để nhét chương trình vào
+          const container = document.getElementById(`group-${item.group}`);
+          if (container) {
+            const div = document.createElement('div');
+            div.className = 'program-item';
+            // Tạo nội dung thẻ: Số thứ tự + Tên
+            div.innerHTML = `<span class="prog-id">#${item.id}</span> ${item.name}`;
+            // Gán sự kiện click để mở modal
+            div.onclick = () => openModalDetails(item);
+            container.appendChild(div);
+          }
+        });
+      }
+      // 2. Hàm tìm kiếm (Lọc theo thời gian thực)
+      function filterPrograms() {
+        const inputStr = document.getElementById('searchInput').value.toLowerCase();
+        const allItems = document.querySelectorAll('.program-item');
+        allItems.forEach(item => {
+          const textContent = item.innerText.toLowerCase();
+          // Nếu từ khóa có trong tên chương trình thì hiện, không thì ẩn
+          if (textContent.includes(inputStr)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      }
+      // 3. Các hàm xử lý Modal (Cửa sổ chi tiết)
+      const modal = document.getElementById('modalOverlay');
+      // Hàm mở modal và điền dữ liệu
+      function openModalDetails(item) {
+        // Điền thông tin cơ bản
+        document.getElementById('modalTitle').innerText = `${item.id}. ${item.name}`;
+        document.getElementById('p-goal').innerText = item.goal;
+        document.getElementById('p-target').innerText = item.target;
+        document.getElementById('p-lead').innerText = item.lead;
+        // Điền danh sách nhiệm vụ TYT (Tab 2)
+        const tytList = document.getElementById('p-tasks-tyt');
+        tytList.innerHTML = ""; // Xóa cũ
+        if (item.tasksTYT && item.tasksTYT.length > 0 && item.tasksTYT[0] !== "Đang cập nhật nội dung...") {
+          item.tasksTYT.forEach(task => {
+            tytList.innerHTML += `<li>${task}</li>`;
+          });
         } else {
-          item.style.display = 'none';
+          tytList.innerHTML = "<li><em>Chưa có dữ liệu nhiệm vụ cụ thể.</em></li>";
         }
-      });
-    }
-    // 3. Các hàm xử lý Modal (Cửa sổ chi tiết)
-    const modal = document.getElementById('modalOverlay');
-    // Hàm mở modal và điền dữ liệu
-    function openModalDetails(item) {
-      // Điền thông tin cơ bản
-      document.getElementById('modalTitle').innerText = `${item.id}. ${item.name}`;
-      document.getElementById('p-goal').innerText = item.goal;
-      document.getElementById('p-target').innerText = item.target;
-      document.getElementById('p-lead').innerText = item.lead;
-      // Điền danh sách nhiệm vụ TYT (Tab 2)
-      const tytList = document.getElementById('p-tasks-tyt');
-      tytList.innerHTML = ""; // Xóa cũ
-      if (item.tasksTYT && item.tasksTYT.length > 0 && item.tasksTYT[0] !== "Đang cập nhật nội dung...") {
-        item.tasksTYT.forEach(task => {
-          tytList.innerHTML += `<li>${task}</li>`;
-        });
-      } else {
-        tytList.innerHTML = "<li><em>Chưa có dữ liệu nhiệm vụ cụ thể.</em></li>";
+        // Điền thông tin phối hợp (Tab 3)
+        document.getElementById('p-coop-units').innerText = item.coopUnits;
+        const coopList = document.getElementById('p-tasks-coop');
+        coopList.innerHTML = ""; // Xóa cũ
+        if (item.tasksCoop && item.tasksCoop.length > 0 && item.tasksCoop[0] !== "...") {
+          item.tasksCoop.forEach(task => {
+            coopList.innerHTML += `<li>${task}</li>`;
+          });
+        } else {
+          coopList.innerHTML = "<li><em>Chưa có dữ liệu phối hợp cụ thể.</em></li>";
+        }
+        // Mặc định mở tab đầu tiên khi bật modal
+        switchTab('overview');
+        // Hiện modal
+        modal.style.display = 'flex';
       }
-      // Điền thông tin phối hợp (Tab 3)
-      document.getElementById('p-coop-units').innerText = item.coopUnits;
-      const coopList = document.getElementById('p-tasks-coop');
-      coopList.innerHTML = ""; // Xóa cũ
-      if (item.tasksCoop && item.tasksCoop.length > 0 && item.tasksCoop[0] !== "...") {
-        item.tasksCoop.forEach(task => {
-          coopList.innerHTML += `<li>${task}</li>`;
-        });
-      } else {
-        coopList.innerHTML = "<li><em>Chưa có dữ liệu phối hợp cụ thể.</em></li>";
+      // Hàm đóng modal
+      function closeModal() {
+        modal.style.display = 'none';
       }
-      // Mặc định mở tab đầu tiên khi bật modal
-      switchTab('overview');
-      // Hiện modal
-      modal.style.display = 'flex';
-    }
-    // Hàm đóng modal
-    function closeModal() {
-      modal.style.display = 'none';
-    }
-    // Hàm chuyển đổi giữa các Tab trong modal
-    function switchTab(tabName) {
-      // 1. Bỏ active ở tất cả các nút tab
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      // 2. Ẩn tất cả nội dung tab
-      document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
-      // 3. Kích hoạt tab được chọn
-      if (tabName === 'overview') {
-        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-        document.getElementById('tab-overview').classList.remove('hidden');
-      } else if (tabName === 'tasks') {
-        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
-        document.getElementById('tab-tasks').classList.remove('hidden');
-      } else if (tabName === 'coop') {
-        document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
-        document.getElementById('tab-coop').classList.remove('hidden');
+      // Hàm chuyển đổi giữa các Tab trong modal
+      function switchTab(tabName) {
+        // 1. Bỏ active ở tất cả các nút tab
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        // 2. Ẩn tất cả nội dung tab
+        document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
+        // 3. Kích hoạt tab được chọn
+        if (tabName === 'overview') {
+          document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+          document.getElementById('tab-overview').classList.remove('hidden');
+        } else if (tabName === 'tasks') {
+          document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+          document.getElementById('tab-tasks').classList.remove('hidden');
+        } else if (tabName === 'coop') {
+          document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+          document.getElementById('tab-coop').classList.remove('hidden');
+        }
       }
-    }
-    // Đóng modal khi click ra vùng tối bên ngoài
-    window.onclick = (e) => {
-      if (e.target == modal) closeModal();
-    }
-    // CHẠY HÀM KHỞI TẠO KHI TRANG WEB TẢI XONG
-    initDashboard();
-  </script>
-
-</body>
-
+      // Đóng modal khi click ra vùng tối bên ngoài
+      window.onclick = (e) => {
+        if (e.target == modal) closeModal();
+      }
+      // CHẠY HÀM KHỞI TẠO KHI TRANG WEB TẢI XONG
+      initDashboard();
+    </script>
+  </body>
 </html>
