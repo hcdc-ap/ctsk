@@ -1,17 +1,9 @@
-const CACHE_NAME = 'hcdc-cache-v1';
-const assets = [
-  'index.html',
-  'manifest.json'
-];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(assets))
-  );
+// Cài đặt Service Worker
+self.addEventListener('install', (e) => {
+  console.log('[Service Worker] Đã cài đặt thành công!');
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
-  );
+// Bỏ qua bộ nhớ đệm (Cache) để luôn tải dữ liệu mới nhất từ GitHub
+self.addEventListener('fetch', (e) => {
+  e.respondWith(fetch(e.request));
 });
