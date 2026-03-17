@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tra cứu Chương trình Sức khỏe - HCDC</title>
+    <title>Chương trình Sức khỏe - HCDC</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#008b99" />
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/hcdc-ap/images-host/refs/heads/main/images/favicon.ico" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link
       rel="icon"
       type="image/png"
@@ -388,11 +393,6 @@
       }
     </style>
   </head>
-
-  </head>
-
-
-
 <body>
 
   <div class="fixed-header">
@@ -405,7 +405,7 @@
 
     </div>
 
-    <p class="brand-subtitle">Dành cho Trạm Y tế phường, xã, đặc khu</p>
+    <p class="brand-subtitle">Dành cho Nhân viên Y tế TP.HCM</p>
 
     <div class="search-box-container">
 
@@ -635,7 +635,14 @@
 
   <script>
 
-
+// Đăng ký Service Worker để biến Web thành App
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('PWA đã sẵn sàng!'))
+          .catch(err => console.log('Lỗi PWA:', err));
+      });
+    }
     // --- CƠ SỞ DỮ LIỆU 22 CHƯƠNG TRÌNH ---
 
     // Dữ liệu được trích xuất từ file CSV bạn cung cấp.
