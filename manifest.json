@@ -7,13 +7,13 @@
   "theme_color": "#008b99",
   "icons": [
     {
-      "src": "https://github.com/hcdc-ap/images-host/blob/main/images/hcdc%20(1).png?raw=true",
+      "src": "https://raw.githubusercontent.com/hcdc-ap/images-host/main/images/hcdc%20(1).png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://github.com/hcdc-ap/images-host/blob/main/images/hcdc%20(1).png?raw=true",
+      "src": "https://raw.githubusercontent.com/hcdc-ap/images-host/main/images/hcdc%20(1).png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
