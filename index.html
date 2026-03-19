@@ -4,27 +4,25 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chương trình Sức khỏe - HCDC</title>
+
 <link rel="manifest" href="manifest.json" />
+
 <!-- Theme color -->
 <meta name="theme-color" content="#008b99" />
-<!-- Apple / iOS PWA support (đã cập nhật) -->
+
+<!-- PWA / Mobile Web App (đã sửa deprecated) -->
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" /> <!-- giữ tạm để tương thích cũ -->
+<meta name="apple-mobile-web-app-capable" content="yes" /> <!-- giữ tạm để tương thích -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Tra cứu HCDC" />
-<!-- Apple Touch Icon (nên dùng PNG thay vì .ico) -->
+
+<!-- Apple Touch Icon - Nên đổi sang PNG 180x180 (không dùng .ico) -->
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/hcdc-ap/images-host/refs/heads/main/images/icon-180.png" />
-<!-- Favicon (tùy chọn) -->
+
+<!-- Favicon thông thường -->
 <link rel="icon" href="https://raw.githubusercontent.com/hcdc-ap/images-host/refs/heads/main/images/favicon.ico" type="image/x-icon" />
-    <link
-      rel="icon"
-      type="image/png"
-      href="https://raw.githubusercontent.com/hcdc-ap/images-host/refs/heads/main/images/favicon.ico"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
     <style>
       /* --- 1. CẤU HÌNH MÀU SẮC TỪ LOGO HCDC --- */
       :root {
@@ -634,15 +632,13 @@
 
     </div>
 
-
-
-    <iframe 
-    id="formIframe" 
-    src="" 
-    style="width:100%; flex-grow:1; border:none; background: transparent;"
-    allow="geolocation *; accelerometer; gyroscope; magnetometer; camera; microphone; encrypted-media; fullscreen"
-    allowfullscreen>
-  </iframe>
+<iframe 
+  id="formIframe" 
+  src="" 
+  style="width:100%; flex-grow:1; border:none; background: transparent;"
+  allow="geolocation *; accelerometer; gyroscope; magnetometer; camera; microphone; encrypted-media; fullscreen; display-capture"
+  allowfullscreen="true">
+</iframe>
 
   </div>
 
