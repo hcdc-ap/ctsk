@@ -349,7 +349,7 @@
         font-size: 1.2rem;
       }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
   </head>
 <body>
   <div class="fixed-header">
@@ -1000,24 +1000,12 @@
       closeModal(); // Đóng cái cửa sổ thông tin nhỏ lại cho gọn
     }
     // Hàm đóng Form nhập liệu và trở về trang chủ
-    function closeIframe() {
-      // Hiển thị cảnh báo bằng SweetAlert2
-      Swal.fire({
-        title: 'Bạn có chắc chắn muốn đóng?',
-        text: 'Dữ liệu chưa lưu sẽ bị mất!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6', // Màu nút đồng ý (có thể đổi tùy ý)
-        cancelButtonColor: '#d33',     // Màu nút hủy
-        confirmButtonText: 'Đồng ý, đóng lại',
-        cancelButtonText: 'Hủy bỏ'
-      }).then((result) => {
-        // Nếu người dùng bấm "Đồng ý"
-        if (result.isConfirmed) {
-          document.getElementById('iframeOverlay').style.display = 'none'; // Ẩn lớp phủ đi
-          document.getElementById('formIframe').src = ""; // Xóa link để làm nhẹ trang
-        }
-      });
+     function closeIframe() {
+     // Có thể thêm cảnh báo nếu họ đang nhập dở tay
+      if(confirm("Bạn có chắc chắn muốn đóng? Dữ liệu chưa Lưu sẽ bị mất.")) {
+        document.getElementById('iframeOverlay').style.display = 'none'; // Ẩn lớp phủ đi
+        document.getElementById('formIframe').src = ""; // Xóa link để làm nhẹ trang
+      }
     }
     // CHẠY HÀM KHỞI TẠO KHI TRANG WEB TẢI XONG
     initDashboard();
