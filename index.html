@@ -471,6 +471,16 @@
 </iframe>
   </div>
   <script>
+  // --- (THÊM) tiện ích chống XSS ---
+function escapeHtml(value) {
+  if (value === undefined || value === null) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 // Đăng ký Service Worker để biến Web thành App
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -892,21 +902,25 @@
     ];
     // --- CÁC HÀM XỬ LÝ GIAO DIỆN (JAVASCRIPT) ---
     // 1. Hàm khởi tạo: Vẽ danh sách chương trình ra màn hình
-    function initDashboard() {
-      db.forEach(item => {
-        // Tìm đúng cột nhóm để nhét chương trình vào
-        const container = document.getElementById(`group-${item.group}`);
-        if (container) {
-          const div = document.createElement('div');
-          div.className = 'program-item';
-          // Tạo nội dung thẻ: Số thứ tự + Tên
-          div.innerHTML = `<span class="prog-id">#${item.id}</span> ${item.name}`;
-          // Gán sự kiện click để mở modal
-          div.onclick = () => openModalDetails(item);
-          container.appendChild(div);
-        }
-      });
-    }
+    // --- (THAY) vẽ danh sách chương trình ---
+function initDashboard() {
+  db.forEach((item) => {
+    const container = document.getElementById(`group-${item.group}`);
+    if (!container) return;
+ 
+    const div = document.createElement('div');
+    div.className = 'program-item';
+    // Dùng textContent + span an toàn thay vì nhồi chuỗi vào innerHTML
+    const idSpan = document.createElement('span');
+    idSpan.className = 'prog-id';
+    idSpan.textContent = `#${item.id}`;
+    div.appendChild(idSpan);
+    div.appendChild(document.createTextNode(' ' + item.name));
+ 
+    div.onclick = () => openModalDetails(item);
+    container.appendChild(div);
+  });
+}
     // 2. Hàm tìm kiếm (Lọc theo thời gian thực)
     function filterPrograms() {
       const inputStr = document.getElementById('searchInput').value.toLowerCase();
@@ -924,49 +938,59 @@
     // 3. Các hàm xử lý Modal (Cửa sổ chi tiết)
     const modal = document.getElementById('modalOverlay');
     // Hàm mở modal và điền dữ liệu
-    function openModalDetails(item) {
-      // Điền thông tin cơ bản
-      document.getElementById('modalTitle').innerText = `${item.id}. ${item.name}`;
-      document.getElementById('p-goal').innerText = item.goal;
-      document.getElementById('p-target').innerText = item.target;
-      document.getElementById('p-lead').innerText = item.lead;
-      // Điền danh sách nhiệm vụ TYT (Tab 2)
-      const tytList = document.getElementById('p-tasks-tyt');
-      tytList.innerHTML = ""; // Xóa cũ
-      if (item.tasksTYT && item.tasksTYT.length > 0 && item.tasksTYT[0] !== "Đang cập nhật nội dung...") {
-        item.tasksTYT.forEach(task => {
-          tytList.innerHTML += `<li>${task}</li>`;
-        });
-      } else {
-        tytList.innerHTML = "<li><em>Chưa có dữ liệu nhiệm vụ cụ thể.</em></li>";
-      }
-      // Điền thông tin phối hợp (Tab 3)
-      document.getElementById('p-coop-units').innerText = item.coopUnits;
-      const coopList = document.getElementById('p-tasks-coop');
-      coopList.innerHTML = ""; // Xóa cũ
-      if (item.tasksCoop && item.tasksCoop.length > 0 && item.tasksCoop[0] !== "...") {
-        item.tasksCoop.forEach(task => {
-          coopList.innerHTML += `<li>${task}</li>`;
-        });
-      } else {
-        coopList.innerHTML = "<li><em>Chưa có dữ liệu phối hợp cụ thể.</em></li>";
-      }
-      // Xử lý điền danh sách biểu mẫu (Tab 4)
-      const formsList = document.getElementById('p-forms-list');
-      formsList.innerHTML = ""; // Xóa dữ liệu cũ
-      if (item.forms && item.forms.length > 0) {
-        item.forms.forEach(form => {
-          // Khi click sẽ mở link Web App chứa form nhập liệu ra tab mới
-          formsList.innerHTML += `<div class="form-btn" onclick="openIframe('${form.link}')">${form.name}</div>`;
-        });
-      } else {
-        formsList.innerHTML = "<p style='color: var(--hcdc-orange); font-style: italic;'>Hiện chưa có biểu mẫu trực tuyến cho chương trình này.</p>";
-      }
-      // Mặc định mở tab đầu tiên khi bật modal
-      switchTab('overview');
-      // Hiện modal
-      modal.style.display = 'flex';
-    }
+    // --- (THAY) mở modal chi tiết ---
+function openModalDetails(item) {
+  document.getElementById('modalTitle').textContent = `${item.id}. ${item.name}`;
+  document.getElementById('p-goal').textContent = item.goal || '';
+  document.getElementById('p-target').textContent = item.target || '';
+  document.getElementById('p-lead').textContent = item.lead || '';
+ 
+  // Nhiệm vụ TYT
+  const tytList = document.getElementById('p-tasks-tyt');
+  tytList.innerHTML = '';
+  if (item.tasksTYT && item.tasksTYT.length && item.tasksTYT[0] !== 'Đang cập nhật nội dung...') {
+    item.tasksTYT.forEach((task) => {
+      const li = document.createElement('li');
+      li.textContent = task;
+      tytList.appendChild(li);
+    });
+  } else {
+    tytList.innerHTML = '<li><em>Chưa có dữ liệu nhiệm vụ cụ thể.</em></li>';
+  }
+ 
+  // Phối hợp
+  document.getElementById('p-coop-units').textContent = item.coopUnits || '';
+  const coopList = document.getElementById('p-tasks-coop');
+  coopList.innerHTML = '';
+  if (item.tasksCoop && item.tasksCoop.length && item.tasksCoop[0] !== '...') {
+    item.tasksCoop.forEach((task) => {
+      const li = document.createElement('li');
+      li.textContent = task;
+      coopList.appendChild(li);
+    });
+  } else {
+    coopList.innerHTML = '<li><em>Chưa có dữ liệu phối hợp cụ thể.</em></li>';
+  }
+ 
+  // Biểu mẫu — tạo phần tử bằng DOM, chỉ nhận link https hợp lệ
+  const formsList = document.getElementById('p-forms-list');
+  formsList.innerHTML = '';
+  if (item.forms && item.forms.length) {
+    item.forms.forEach((form) => {
+      const btn = document.createElement('div');
+      btn.className = 'form-btn';
+      btn.textContent = form.name;
+      btn.onclick = () => openIframe(form.link);
+      formsList.appendChild(btn);
+    });
+  } else {
+    formsList.innerHTML =
+      "<p style='color: var(--hcdc-orange); font-style: italic;'>Hiện chưa có biểu mẫu trực tuyến cho chương trình này.</p>";
+  }
+ 
+  switchTab('overview');
+  modal.style.display = 'flex';
+}
     // Hàm đóng modal
     function closeModal() {
       modal.style.display = 'none';
@@ -994,11 +1018,25 @@
       if (e.target == modal) closeModal();
     }
     // Hàm mở Form nhập liệu trên cùng 1 trang
-    function openIframe(url) {
-      document.getElementById('formIframe').src = url; // Gắn link Web App vào iframe
-      document.getElementById('iframeOverlay').style.display = 'flex'; // Hiển thị lớp phủ lên toàn màn hình
-      closeModal(); // Đóng cái cửa sổ thông tin nhỏ lại cho gọn
+    // --- (THAY) mở iframe: chỉ chấp nhận link script.google.com ---
+function openIframe(url) {
+  try {
+    const u = new URL(url);
+    const allowed = u.protocol === 'https:' &&
+      (u.hostname.endsWith('script.google.com') ||
+       u.hostname.endsWith('google.com'));
+    if (!allowed) {
+      alert('Liên kết biểu mẫu không hợp lệ.');
+      return;
     }
+  } catch (e) {
+    alert('Liên kết biểu mẫu không hợp lệ.');
+    return;
+  }
+  document.getElementById('formIframe').src = url;
+  document.getElementById('iframeOverlay').style.display = 'flex';
+  closeModal();
+}
     // Hàm đóng Form nhập liệu và trở về trang chủ
      function closeIframe() {
      // Có thể thêm cảnh báo nếu họ đang nhập dở tay
